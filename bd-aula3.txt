@@ -1,0 +1,20 @@
+create database db_aula03;
+\c db_aula03
+create table tbl_cliente(codigo_cliente integer primary key, Nome text not null, cidade text, Endereco text);
+create table tbl_titulo(codigo_titulo integer primary key, titulo text not null, descricao text, categoria text);
+create table tbl_emprestimo(numero_emprestimo integer primary key, codigo_cliente text, codigo_livro text);
+create table tbl_livros(cod_livro integer primary key, codigo_titulo text, status text);
+
+create domain chk_categoria text check(value in('Drama','Comedia'));
+create domain chk_status text check(value in('Disponivel','Alugado'));
+
+alter table tbl_titulo alter column categoria type chk_categoria;
+alter table tbl_livros alter column status type chk_status;
+alter table tbl_emprestimo alter column codigo_cliente type integer USING codigo_cliente::integer ;
+alter table tbl_emprestimo add constraint fk_cliente foreign key (codigo_cliente) references tbl_cliente (codigo_cliente);
+
+alter table tbl_emprestimo alter column codigo_livro type integer USING codigo_cliente::integer ;
+alter table tbl_emprestimo add constraint fk_livro foreign key (codigo_livro) references tbl_livros (cod_livro);
+alter table tbl_livros add constraint fk_livros foreign key (cod_livro) references tbl_titulo (codigo_titulo);
+alter table tbl_livros alter column codigo_titulo type integer USING codigo_titulo::integer ;
+alter table tbl_livros add constraint fk_livros foreign key (codigo_titulo) references tbl_titulo (codigo_titulo);
