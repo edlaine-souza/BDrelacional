@@ -1,0 +1,110 @@
+-- criar banco de dados
+create database bd_aula04;
+-- entrar no banco de dados criado
+\c bd_aula04
+-- criação das tabelas
+create table tbl_cliente(codigo_cliente integer primary key, Nome text not null, cidade text, Endereco text);
+create table tbl_titulo(codigo_titulo integer primary key, titulo text not null, descricao text, categoria text);
+create table tbl_emprestimo(numero_emprestimo integer primary key, codigo_cliente text, codigo_livro text);
+create table tbl_livros(cod_livro integer primary key, codigo_titulo text, status text);
+-- criação dos dominios
+create domain chk_categoria text check(value in('Drama','Comedia'));
+create domain chk_status text check(value in('Disponivel','Alugado'));
+-- alterar tabelas
+alter table tbl_titulo alter column categoria type chk_categoria;
+alter table tbl_livros alter column status type chk_status;
+-- alterar tipo da coluna
+alter table tbl_emprestimo alter column codigo_cliente type integer USING codigo_cliente::integer ;
+-- criar chave estrangeira
+alter table tbl_emprestimo add constraint fk_cliente foreign key (codigo_cliente) references tbl_cliente (codigo_cliente);
+alter table tbl_emprestimo alter column codigo_livro type integer USING codigo_cliente::integer ;
+alter table tbl_emprestimo add constraint fk_livro foreign key (codigo_livro) references tbl_livros (cod_livro);
+alter table tbl_livros alter column codigo_titulo type integer USING codigo_titulo::integer ;
+alter table tbl_livros add constraint fk_livros foreign key (codigo_titulo) references tbl_titulo (codigo_titulo);
+-- inserir dados na tabelas
+insert into tbl_cliente (codigo_cliente, nome, cidade, endereco)
+values 
+(1, 'Joao Silva', 'Sao Paulo', 'Rua A 123'), 
+(2, 'Maria Santos', 'Rio de Janeiro', 'Av. B,456'), 
+(3, 'Pedro Almeida', 'Belo Horizonte', 'Rua C,789'), 
+(4, 'Ana Oliveira','Salvador','Av.D,1011'), 
+(5, 'Carlos Lima', 'Brasilia', 'Rua E,1213');
+insert into tbl_titulo (codigo_titulo, titulo, descricao, categoria) 
+values 
+(1, 'Aventuras Urbanas', 'Uma história emocionante', 'Drama'), 
+(2, 'Mistérios Antigos', 'Enigmas por resolver', 'Comedia'), 
+(3, 'Amor nas Estrelas', 'Um romance intergalático', 'Drama'), 
+(4, 'Código Enigmático','Segredos ocultos','Comedia'), 
+(5, 'Histórias Perdidas', 'Contos esquecidos', 'Drama');
+insert into tbl_livros (cod_livro, codigo_titulo, status) 
+values 
+(1, 1, 'Disponivel'), 
+(2, 1, 'Alugado'), 
+(3, 2, 'Disponivel'), 
+(4, 3,'Alugado'), 
+(5, 4, 'Disponivel');
+insert into tbl_emprestimo (numero_emprestimo, codigo_cliente, codigo_livro) 
+values 
+(1, 1, 2), 
+(2, 2, 4), 
+(3, 3, 1), 
+(4, 4, 5), 
+(5, 5, 3);
+-- select
+select nome from tbl_cliente;
+     nome
+---------------
+ Joao Silva
+ Maria Santos
+ Pedro Almeida
+ Ana Oliveira
+ Carlos Lima
+(5 rows)
+select * from tbl_cliente where cidade = 'Sao Paulo';
+ codigo_cliente |    nome    |  cidade   | endereco
+----------------+------------+-----------+-----------
+              1 | Joao Silva | Sao Paulo | Rua A 123
+(1 row)
+select nome from tbl_cliente where codigo_cliente > 3;
+     nome
+--------------
+ Ana Oliveira
+ Carlos Lima
+(2 rows)
+select codigo_cliente, nome from tbl_cliente where codigo_cliente > 3;
+ codigo_cliente |     nome
+----------------+--------------
+              4 | Ana Oliveira
+              5 | Carlos Lima
+(2 rows)
+select titulo from tbl_titulo;
+       titulo
+--------------------
+ Aventuras Urbanas
+ Mistérios Antigos
+ Amor nas Estrelas
+ Código Enigmático
+ Histórias Perdidas
+(5 rows)
+create table tbl_cliente2(codigo integer);
+insert into tbl_cliente2 (codigo) select codigo_cliente from tbl_cliente;
+update tbl_livros set status = 'Disponivel';
+UPDATE 5
+bd_aula04=# select * from tbl_livros;
+ cod_livro | codigo_titulo |   status
+-----------+---------------+------------
+         1 |             1 | Disponivel
+         2 |             1 | Disponivel
+         3 |             2 | Disponivel
+         4 |             3 | Disponivel
+         5 |             4 | Disponivel
+(5 rows)
+delete from tbl_cliente2 where codigo > 3;
+DELETE 2
+bd_aula04=# select * from tbl_cliente2;
+ codigo
+--------
+      1
+      2
+      3
+(3 rows)
